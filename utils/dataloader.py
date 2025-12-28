@@ -1,18 +1,21 @@
 import torchvision
 import torch
 from torch.utils.data import DataLoader
+from torchvision import transforms
+
+transformations = transforms.Compose([transforms.ToTensor()])
 
 
 def cifar_10_dataloader():
-    train_dataset = torchvision.datasets.CIFAR10(root = './cifar10_data',train=True, transform=None, target_transform=None, download=True)
-    test_dataset = torchvision.datasets.CIFAR10(root = './cifar10_data',train=False, transform=None, target_transform=None, download=True)
+    train_dataset = torchvision.datasets.CIFAR10(root = './cifar10_data',train=True, transform=transformations, target_transform=None, download=True)
+    test_dataset = torchvision.datasets.CIFAR10(root = './cifar10_data',train=False, transform=transformations, target_transform=None, download=True)
 
     print(f" \nthe class are   {'--'.join(train_dataset.classes)}\n")
 
     print(f"{train_dataset.data.shape=}")
     print(f"{test_dataset.data.shape=}")
-    train_loader = DataLoader(dataset = train_dataset, batch_size=16, shuffle=True, pin_memory=True)
-    test_loader = DataLoader(dataset = test_dataset, batch_size=16, shuffle=True, pin_memory=True)
+    train_loader = DataLoader(dataset = train_dataset, batch_size=16, shuffle=True, pin_memory=False,num_workers=3)
+    test_loader = DataLoader(dataset = test_dataset, batch_size=16, shuffle=True, pin_memory=False)
 
     return train_dataset, test_dataset, train_loader, test_loader
 
