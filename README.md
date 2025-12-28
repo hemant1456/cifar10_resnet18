@@ -1,7 +1,14 @@
-# cifar10_resnet18
-Implementation and experimentation with resnet 18 like architecture on cifar 10 dataset
+# CIFAR-10 ResNet-18
+Implementation and experimentation with a ResNet-18 inspired architecture on the CIFAR-10 dataset.
 
-# resnet 18 architecture and parameter size
+---
+
+## Architecture and Parameter Size
+The following structure represents the ResNet-18 variant used for this project. The model utilizes a series of residual blocks to maintain gradient flow.
+
+
+
+```text
 ==========================================================================================
 Layer (type:depth-idx)                   Output Shape              Param #
 ==========================================================================================
@@ -87,7 +94,26 @@ Params size (MB): 44.62
 Estimated Total Size (MB): 47.37
 ==========================================================================================
 
+# Training and Results
 
-Training for 10 epoch on default resnet model without any data augmentation led to this accuracy
-epoch = 10: 100%|█████████████████████████| 3125/3125 [00:50<00:00, 62.15it/s, train_loss=0.404, train_accuracy=0.886]│
-epoch = 10: 100%|███████████████████| 625/625 [00:05<00:00, 121.60it/s, test_accuracy=tensor(0.8243, device='cuda:0')]
+The model was trained on the **CIFAR-10** dataset to evaluate the performance of the ResNet-18 architecture. Below are the training parameters and the resulting performance metrics.
+
+---
+
+## 📊 Performance Summary
+
+| Metric | Value |
+| :--- | :--- |
+| **Epochs** | 10 |
+| **Data Augmentation** | None (Default) |
+| **Training Accuracy** | **88.6%** |
+| **Test Accuracy** | **82.43%** |
+
+---
+
+## 🕒 Training Progress
+The following logs represent the final state of the training and testing phases after the 10th epoch.
+
+### Training Log
+```bash
+epoch = 10: 100%|█████████████████████████| 3125/3125 [00:50<00:00, 62.15it/s, train_loss=0.404, train_accuracy=0.886]
