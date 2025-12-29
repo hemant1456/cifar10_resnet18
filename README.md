@@ -1,6 +1,8 @@
 # CIFAR-10 ResNet-18
 Implementation and experimentation with a ResNet-18 inspired architecture on the CIFAR-10 dataset.
 
+The model is live at this url : https://huggingface.co/spaces/hemant-bhambhu/cifar_10_predictor
+
 ---
 
 ## Architecture and Parameter Size
