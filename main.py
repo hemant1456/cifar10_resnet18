@@ -6,18 +6,20 @@ from tqdm import tqdm
 from models.cifar10_resnet_18 import resnet18
 from torchinfo import summary
 from utils.dataloader import cifar_10_dataloader
-
+from torchvision.transforms import v2
 
 
 
 def main():
 
-    train_dataset, test_dataset, train_loader, test_loader = cifar_10_dataloader()
+    train_dataset, test_dataset, train_loader, test_loader = cifar_10_dataloader(64)
+
+    mixup = v2.MixUp(num_classes=10)
 
     if torch.cuda.is_available():
         device = torch.device("cuda")
         print("using GPU")
-    elif torch.mps.is_available():
+    elif torch.backends.mps.is_available():
         device = torch.device("mps")
         print("using Mac mps")
     else:
@@ -29,8 +31,19 @@ def main():
     summary(model, input_data=torch.randn(1,3, 32, 32).to(device))
     
     criterion = CrossEntropyLoss()
-    optimizer = AdamW(params=model.parameters(),lr=0.001)
-    epochs = 3
+    
+
+    epochs = 20
+
+    optimizer = SGD(params=model.parameters(),lr=0.1,momentum=0.9,weight_decay=5e-4)
+    scheduler = torch.optim.lr_scheduler.OneCycleLR(
+        optimizer=optimizer,
+        max_lr = 0.1,
+        steps_per_epoch=len(train_loader),
+        pct_start=0.2,
+        epochs=epochs,
+        anneal_strategy='cos'
+    )
 
     import os
     os.makedirs("./checkpoints",exist_ok=True)
@@ -47,18 +60,21 @@ def main():
         model.train()
         train_pbar = tqdm(train_loader,desc=f"epoch = {epoch+1}")
         for images, labels in train_pbar:
+            images, labels = mixup(images, labels)
             images, labels = images.to(device), labels.to(device)
             optimizer.zero_grad()
             output = model(images)
-            _, prediction = torch.max(output,1)
+            # _, prediction = torch.max(output,dim=1)
             loss= criterion(output, labels)
             loss.backward()
             optimizer.step()
-            correct+= sum(prediction==labels).item()
-            total+= len(labels)
+            scheduler.step()
+            # correct+= (prediction==labels).sum().item() # will not work in mix up
+            # total+= len(labels)
             train_pbar.set_postfix({
                 'train_loss': loss.item(),
-                'train_accuracy': correct/total
+                # 'train_accuracy': correct/total,
+                'learning_rate':optimizer.param_groups[0]['lr']
             })
 
         correct, total = 0, 0 
@@ -70,10 +86,11 @@ def main():
                 output = model(images)
                 _, prediction = torch.max(output,1)
                 loss= criterion(output, labels)
-                correct+= sum(prediction==labels)
+                correct+= (prediction==labels).sum().item()
                 total+= len(labels)
                 test_pbar.set_postfix({
-                'test_accuracy': correct/total
+                'test_accuracy': correct/total,
+                
             })
         checkpoint = {
                 'model_params':model.state_dict(),
