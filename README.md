@@ -118,4 +118,12 @@ The following logs represent the final state of the training and testing phases 
 
 ### Training Log
 ```bash
-epoch = 10: 100%|█████████████████████████| 3125/3125 [00:50<00:00, 62.15it/s, train_loss=0.404, train_accuracy=0.886]
+epoch = 10: 100%|█████████████████████████| 3125/3125 [00:50<00:00, 62.15it/s, train_loss=0.404, train_accuracy=0.886] test_accuracy = 0.82
+
+After applying following augmentation mixup, randomaffine with p=0.2, horizontal flip p=0.2 and increasing epoch to 30 resulted in test accuracy = 0.883
+
+After adding cutmix augmentation as well along with above augmentation, the test_accuracy marginally improved to 0.887
+
+did aggressive randomaffine and horizontal flip at probability 0.5, accuracy dropeed to 0.878
+
+applied label smoothing while keeping above 
