@@ -7,6 +7,7 @@ from models.cifar10_resnet_18 import resnet18
 from torchinfo import summary
 from utils.dataloader import cifar_10_dataloader
 from torchvision.transforms import v2
+import random
 
 
 
@@ -15,6 +16,7 @@ def main():
     train_dataset, test_dataset, train_loader, test_loader = cifar_10_dataloader(64)
 
     mixup = v2.MixUp(num_classes=10)
+    cutmix = v2.CutMix(num_classes=10)
 
     if torch.cuda.is_available():
         device = torch.device("cuda")
@@ -30,15 +32,15 @@ def main():
 
     summary(model, input_data=torch.randn(1,3, 32, 32).to(device))
     
-    criterion = CrossEntropyLoss()
+    criterion = CrossEntropyLoss(label_smoothing=0.1)
     
 
-    epochs = 20
+    epochs = 30
 
     optimizer = SGD(params=model.parameters(),lr=0.1,momentum=0.9,weight_decay=5e-4)
     scheduler = torch.optim.lr_scheduler.OneCycleLR(
         optimizer=optimizer,
-        max_lr = 0.1,
+        max_lr = 0.01,
         steps_per_epoch=len(train_loader),
         pct_start=0.2,
         epochs=epochs,
@@ -60,7 +62,10 @@ def main():
         model.train()
         train_pbar = tqdm(train_loader,desc=f"epoch = {epoch+1}")
         for images, labels in train_pbar:
-            images, labels = mixup(images, labels)
+            if random.random()>0.5:
+                images, labels = mixup(images, labels)
+            else:
+                images, labels = cutmix(images,labels)
             images, labels = images.to(device), labels.to(device)
             optimizer.zero_grad()
             output = model(images)
