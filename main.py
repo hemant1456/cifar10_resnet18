@@ -3,7 +3,8 @@ import torch
 from torch.nn import CrossEntropyLoss
 from torch.optim import SGD, AdamW
 from tqdm import tqdm
-from models.cifar10_resnet_18 import resnet18
+#from models.cifar10_resnet_18 import resnet18
+from models.tiny_imagenet_resnet_18 import resnet18
 from torchinfo import summary
 from utils.dataloader import cifar_10_dataloader,tiny_imagenet_dataloader
 from torchvision.transforms import v2
@@ -14,7 +15,7 @@ n_classes = 200
 def main():
 
     #train_dataset, test_dataset, train_loader, test_loader = cifar_10_dataloader(64)
-    train_dataset, test_dataset, train_loader, test_loader = tiny_imagenet_dataloader(64)
+    train_dataset, test_dataset, train_loader, test_loader,sampler = tiny_imagenet_dataloader(64)
 
     mixup = v2.MixUp(num_classes=n_classes)
     cutmix = v2.CutMix(num_classes=n_classes)
@@ -31,14 +32,14 @@ def main():
 
     model = resnet18(n_classes=n_classes).to(device)
 
-    summary(model, input_data=torch.randn(1,3, 32, 32).to(device))
+    summary(model, input_data=torch.randn(1,3, 64, 64).to(device))
     
     criterion = CrossEntropyLoss(label_smoothing=0.1)
     
 
     epochs = 30
 
-    optimizer = SGD(params=model.parameters(),lr=0.1,momentum=0.9,weight_decay=5e-4)
+    optimizer = SGD(params=model.parameters(),lr=0.01,momentum=0.9,weight_decay=5e-4)
     scheduler = torch.optim.lr_scheduler.OneCycleLR(
         optimizer=optimizer,
         max_lr = 0.01,
@@ -63,10 +64,11 @@ def main():
         model.train()
         train_pbar = tqdm(train_loader,desc=f"epoch = {epoch+1}")
         for images, labels in train_pbar:
-            if random.random()>0.5:
-                images, labels = mixup(images, labels)
-            else:
-                images, labels = cutmix(images,labels)
+            if random.random() > 0.5:
+                if random.random()>0.5:
+                    images, labels = mixup(images, labels)
+                else:
+                    images, labels = cutmix(images,labels)
             images, labels = images.to(device), labels.to(device)
             optimizer.zero_grad()
             output = model(images)
