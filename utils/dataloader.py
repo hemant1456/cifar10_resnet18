@@ -39,9 +39,8 @@ def cifar_10_dataloader(batch_size=16,n_workers=0):
 tiny_imagenent_mean = (0.480, 0.448, 0.398)
 tiny_imagenent_std  = (0.276, 0.269, 0.282)
 tiny_imagenet_train_transformations = v2.Compose([
-    v2.RandomHorizontalFlip(p=0.2),
-    v2.RandomApply([v2.RandomAffine(degrees=15,translate=(0.1,0.1),scale=(0.75,1.25),shear=10)],p=0.2),
     v2.ToImage(),
+    v2.RandAugment(num_ops=2, magnitude=9),
     v2.ToDtype(torch.float32,scale=True),
     v2.Normalize(tiny_imagenent_mean,tiny_imagenent_std)])
 
