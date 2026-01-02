@@ -43,7 +43,7 @@ tiny_imagenet_train_transformations = v2.Compose([
     v2.RandomApply([v2.RandomAffine(degrees=15,translate=(0.1,0.1),scale=(0.75,1.25),shear=10)],p=0.2),
     v2.ToImage(),
     v2.ToDtype(torch.float32,scale=True),
-    v2.Normalize(cifar_mean,cifar_std)])
+    v2.Normalize(tiny_imagenent_mean,tiny_imagenent_std)])
 
 tiny_imagenet_test_transformations = v2.Compose([
     v2.ToImage(),
