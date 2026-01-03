@@ -12,11 +12,21 @@ from torchvision.transforms import v2
 import random
 n_classes = 200
 
+import argparse
+
+parser = argparse.ArgumentParser("resnet training")
+n_classes = 200
+
 
 def main():
 
+    parser.add_argument("--epochs",default=30,type=int)
+    parser.add_argument("--batch_size",default=64,type=int)
+
+    args = parser.parse_args()
+
     #train_dataset, test_dataset, train_loader, test_loader = cifar_10_dataloader(64)
-    train_dataset, test_dataset, train_loader, test_loader,sampler = tiny_imagenet_dataloader(256)
+    train_dataset, test_dataset, train_loader, test_loader,sampler = tiny_imagenet_dataloader(args.batch_size)
 
     mixup = v2.MixUp(num_classes=n_classes)
     cutmix = v2.CutMix(num_classes=n_classes)
@@ -39,7 +49,7 @@ def main():
     criterion = CrossEntropyLoss(label_smoothing=0.1)
     
 
-    epochs = 30
+    epochs = args.epochs
 
     optimizer = SGD(params=model.parameters(),lr=0.01,momentum=0.9,weight_decay=5e-4)
     scheduler = torch.optim.lr_scheduler.OneCycleLR(

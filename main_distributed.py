@@ -13,6 +13,9 @@ import random
 from torch.nn.parallel import DistributedDataParallel as DDP
 import torch.distributed as dist
 import os
+import argparse
+
+parser = argparse.ArgumentParser("resnet training")
 n_classes = 200
 
 
@@ -28,6 +31,11 @@ def cleanup():
 def main():
 
     #train_dataset, test_dataset, train_loader, test_loader = cifar_10_dataloader(64)
+
+    parser.add_argument("--epochs",default=30,type=int)
+    parser.add_argument("--batch_size",default=64,type=int)
+
+    args = parser.parse_args()
     
 
     mixup = v2.MixUp(num_classes=n_classes)
@@ -36,12 +44,12 @@ def main():
     local_rank = setup_distributed()
 
     if local_rank==0:
-        train_dataset, test_dataset, train_loader, test_loader,data_sampler = tiny_imagenet_dataloader(64,n_workers =3,distributed=True)
+        train_dataset, test_dataset, train_loader, test_loader,data_sampler = tiny_imagenet_dataloader(args.batch_size,n_workers =3,distributed=True)
     
     dist.barrier()
 
     if local_rank!=0:
-        train_dataset, test_dataset, train_loader, test_loader,data_sampler = tiny_imagenet_dataloader(64,n_workers =3,distributed=True)
+        train_dataset, test_dataset, train_loader, test_loader,data_sampler = tiny_imagenet_dataloader(args.batch_size,n_workers =3,distributed=True)
     
     dist.barrier()
     device = torch.device(f"cuda:{local_rank}")
@@ -56,7 +64,7 @@ def main():
     criterion = CrossEntropyLoss(label_smoothing=0.1)
     
 
-    epochs = 30
+    epochs = args.epochs
 
     optimizer = SGD(params=model.parameters(),lr=0.01,momentum=0.9,weight_decay=5e-4)
     scheduler = torch.optim.lr_scheduler.OneCycleLR(
