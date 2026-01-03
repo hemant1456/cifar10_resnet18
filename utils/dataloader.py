@@ -57,8 +57,8 @@ def tiny_imagenet_dataloader(batch_size=16,distributed=False,n_workers=0):
     if distributed:
         data_sampler = DistributedSampler(train_dataset)
 
-    train_loader = DataLoader(dataset = train_dataset, batch_size=batch_size, shuffle=False if data_sampler else True, pin_memory=False,num_workers=n_workers,sampler=data_sampler,drop_last=True)
-    test_loader = DataLoader(dataset = test_dataset, batch_size=batch_size, pin_memory=False)
+    train_loader = DataLoader(dataset = train_dataset, batch_size=batch_size, shuffle=False if data_sampler else True, pin_memory=True,num_workers=n_workers,sampler=data_sampler,drop_last=True)
+    test_loader = DataLoader(dataset = test_dataset, batch_size=batch_size, pin_memory=True)
 
     return train_dataset, test_dataset, train_loader, test_loader, data_sampler
 
