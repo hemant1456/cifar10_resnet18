@@ -98,9 +98,10 @@ def main():
         for images, labels in train_pbar:
             images, labels = images.to(device), labels.to(device)
             if random.random()>0.5:
-                images, labels = mixup(images, labels)
-            else:
-                images, labels = cutmix(images,labels)
+                if random.random()>0.5:
+                    images, labels = mixup(images, labels)
+                else:
+                    images, labels = cutmix(images,labels)
             
             optimizer.zero_grad()
             output = model(images)
