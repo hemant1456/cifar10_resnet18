@@ -1,5 +1,15 @@
 cifar10_data
 checkpoints
+final_model.pt 
+tiny_imagenet_data
+exp.ipynb
+.gitignore
+.gradio/
+runpod_trained_model.pt
+gradient_ssh.ipynb
+final_model_imagenet.onnx
+final_model_imagenet.pt
+exp.ipynb
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
