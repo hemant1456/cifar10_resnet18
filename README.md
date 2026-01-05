@@ -1,4 +1,4 @@
-# Tiny ImageNet & CIFAR-10 Classification
+# Resnet 50 model trained on Tiny ImageNet dataset
 
 [![Hugging Face Space](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/hemant-bhambhu/tiny-imagenet-classifier)
 
